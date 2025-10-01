@@ -2,6 +2,7 @@ import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
+// import { cpuTaskPool } from "../lib/workerPool.js"; // Temporarily disabled
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -18,7 +19,8 @@ export const signup = async (req, res) => {
 
     if (user) return res.status(400).json({ message: "Email already exists" });
 
-    const salt = await bcrypt.genSalt(10);
+    // Use traditional bcrypt for now (will enable worker threads later)
+    const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
@@ -56,18 +58,20 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Use traditional bcrypt for now (will enable worker threads later)
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    generateToken(user._id, res);
+    const token = generateToken(user._id, res);
 
     res.status(200).json({
       _id: user._id,
       fullName: user.fullName,
       email: user.email,
       profilePic: user.profilePic,
+      token: token // Include token for load testing
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
@@ -110,6 +114,7 @@ export const updateProfile = async (req, res) => {
 
 export const checkAuth = (req, res) => {
   try {
+    console.log("CheckAuth - Current user:", req.user?.email, "ID:", req.user?._id);
     res.status(200).json(req.user);
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import AuthImagePattern from "../components/AuthImagePattern";
+import OAuthLogin from "../components/OAuthLogin";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 
@@ -96,6 +97,18 @@ const LoginPage = () => {
               )}
             </button>
           </form>
+
+          {/* OAuth Section */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-base-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-base-100 text-base-content/60">Or continue with</span>
+            </div>
+          </div>
+
+          <OAuthLogin />
 
           <div className="text-center">
             <p className="text-base-content/60">

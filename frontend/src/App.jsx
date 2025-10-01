@@ -24,9 +24,15 @@ const App = () => {
     checkAuth();
   }, [checkAuth]);
 
+  // Apply theme to document body for better theme coverage
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.className = 'transition-colors duration-300';
+  }, [theme]);
+
   console.log({ authUser });
 
-  if (isCheckingAuth && !authUser)
+  if (isCheckingAuth)
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader className="size-10 animate-spin" />
@@ -34,7 +40,7 @@ const App = () => {
     );
 
   return (
-    <div data-theme={theme}>
+    <div data-theme={theme} className="transition-colors duration-300">
       <Navbar />
 
       <Routes>

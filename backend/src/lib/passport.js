@@ -93,6 +93,7 @@ const createOrUpdateUser = async (profile, provider, accessToken, refreshToken) 
     const newUser = new User({
       email: providerData.email,
       fullName: providerData.name,
+      profilePic: providerData.picture || "",
       oauthProviders: {
         [provider]: providerData
       },

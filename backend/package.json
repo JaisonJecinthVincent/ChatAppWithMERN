@@ -1,28 +1,62 @@
 {
-  "name": "backend",
+  "name": "fullstack-chat-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/index.js",
+  "type": "module",
+  "main": "cluster.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node cluster.js",
+    "dev": "nodemon cluster.js",
+    "test": "npm run test:unit && npm run test:integration && npm run test:cluster",
+    "test:unit": "jest tests/unit --verbose",
+    "test:integration": "jest tests/integration --verbose",
+    "test:cluster": "jest tests/cluster --verbose",
+    "test:load": "artillery run loadtest.yml",
+    "test:socket-load": "node tests/load/socket-load-test.js",
+    "test:stress": "node tests/load/stress-test.js",
+    "test:stress:small": "node tests/load/stress-test.js small",
+    "test:stress:medium": "node tests/load/stress-test.js medium",
+    "test:stress:large": "node tests/load/stress-test.js large",
+    "test:stress:xlarge": "node tests/load/stress-test.js xlarge",
+    "test:preflight": "node tests/load/preflight-check.js",
+    "test:coverage": "jest --coverage",
+    "worker:messages": "node message-worker-process.js"
+  },
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "axios": "^1.12.2",
+    "bcryptjs": "^2.4.3",
+    "bull": "^3.29.3",
+    "cloudinary": "^1.41.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-session": "^1.18.2",
+    "ioredis": "^5.3.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.2.1",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "redis": "^5.8.2",
+    "redis-cli": "^2.1.2",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "artillery": "^2.0.25",
+    "babel-jest": "^29.7.0",
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.2",
+    "nodemon": "^3.1.0",
+    "socket.io-client": "^4.8.1",
+    "supertest": "^7.0.0"
   },
   "keywords": [],
   "author": "",
-  "type": "module",
   "license": "ISC",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cloudinary": "^2.5.1",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.8.1",
-    "socket.io": "^4.8.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.7"
-  }
+  "description": ""
 }

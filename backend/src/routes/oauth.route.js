@@ -4,6 +4,43 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
+// OAuth Providers Info Endpoint
+router.get('/providers', (req, res) => {
+  try {
+    const providers = {};
+    
+    // Check if Google OAuth is configured
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+      providers.google = {
+        name: 'Google',
+        enabled: true,
+        authUrl: '/api/oauth/google'
+      };
+    }
+    
+    const enabledCount = Object.keys(providers).length;
+    
+    res.json({ 
+      success: true, 
+      providers,
+      configured: enabledCount > 0,
+      setupRequired: enabledCount === 0,
+      message: enabledCount === 0 
+        ? 'OAuth setup required. Please configure OAuth providers.'
+        : 'OAuth providers configured successfully.'
+    });
+  } catch (error) {
+    console.error('Error getting OAuth providers:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error loading OAuth providers',
+      providers: {},
+      configured: false,
+      setupRequired: true
+    });
+  }
+});
+
 // Helper function to generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '15d' });
@@ -46,38 +83,11 @@ router.get('/google', passport.authenticate('google', {
 }));
 
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/api/auth/oauth/error' }),
+  passport.authenticate('google', { failureRedirect: '/api/oauth/error' }),
   handleOAuthSuccess
 );
 
 // Error handling route
 router.get('/error', handleOAuthError);
-
-// Get OAuth providers configuration
-router.get('/providers', (req, res) => {
-  try {
-    console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
-    const providers = {
-      google: {
-        enabled: !!process.env.GOOGLE_CLIENT_ID,
-        name: 'Google',
-        icon: 'google',
-        color: '#4285F4'
-      }
-    };
-    const enabledProviders = Object.entries(providers).filter(([_, config]) => config.enabled);
-    res.json({
-      providers,
-      enabledCount: enabledProviders.length,
-      setupRequired: enabledProviders.length === 0,
-      message: enabledProviders.length === 0 
-        ? 'No OAuth providers configured. Please set up OAuth credentials in your .env file.'
-        : `${enabledProviders.length} OAuth provider(s) configured.`
-    });
-  } catch (error) {
-    console.error('Error in /providers route:', error);
-    res.status(500).json({ message: 'Internal Server Error', error: error.message });
-  }
-});
 
 export default router;
